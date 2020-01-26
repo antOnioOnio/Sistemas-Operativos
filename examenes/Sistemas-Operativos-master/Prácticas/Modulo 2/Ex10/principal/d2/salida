@@ -1,0 +1,8 @@
+antonio@antonio-ordenador:~/Escritorio/a$ cat archivo 
+abcdefghijABCDEFGHIJantonio@antonio-ordenador:~/Escritorio/a$ od -c archivo 
+0000000   a   b   c   d   e   f   g   h   i   j  \0  \0  \0  \0  \0  \0
+0000020  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000040  \0  \0  \0  \0  \0  \0  \0  \0   A   B   C   D   E   F   G   H
+0000060   I   J
+0000062
+

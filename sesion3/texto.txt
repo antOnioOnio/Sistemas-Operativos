@@ -1,0 +1,13 @@
+a.out
+eje
+ejercicio1.c
+ejercicio3Jerarquia.c
+ejercicio4.c
+ejercicio5.c
+ejercicio7.c
+tarea4
+tarea4.c
+tarea5
+tarea5.c
+tarea.c
+texto.txt

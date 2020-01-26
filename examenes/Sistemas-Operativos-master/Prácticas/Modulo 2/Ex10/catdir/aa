@@ -1,0 +1,298 @@
+#include<sys/types.h>  	//Primitive system data types for abstraction of implementation-dependent data types.
+						//POSIX Standard: 2.6 Primitive System Data Types <sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<errno.h>
+
+
+int main(int argc, char *argv[]) {
+    int i=1;
+    int fd1;//descriptor de archivo del primer archivo
+    int fd2;//descriptor de archivo del segundo archivo
+    int tam=10;
+    char buf1[80];
+    char *name;
+    if(argc>=2) {
+        name=argv[1];
+    }
+    if(argc<2) {//si no sele para un pathname, se debe utilizar la entrada estandarpara recogerlo
+        char name2[20];
+	printf("intruduce el pathname: ");
+        scanf("%s",name2);
+        name=name2;
+    }
+
+    if((fd1=open("archivo2",O_CREAT|O_TRUNC|O_WRONLY,S_IRUSR|S_IWUSR))<0) {
+        printf("\nError %d en open",errno);
+        perror("\nError en open");
+        exit(-1);
+    }
+    if((fd2=open(name,O_RDONLY,S_IRUSR|S_IWUSR))<0) {
+        printf("\nError %d en open",errno);
+        perror("\nError en open");
+        exit(-1);
+    }
+    while(read(fd2,buf1,80)>0) {
+        char bloc[tam];
+        sprintf(bloc,"\nBloque %d\n",i);//en el vector de char bloc metemos  Bloque i//siendo i un numero que va ++
+        if(write(fd1,bloc,tam) ==-1) {
+            perror("\nError en write");
+            exit(-1);
+        }
+        if(write(fd1,buf1,80) ==-1) {
+            perror("\nError en write");
+            exit(-1);
+        }
+        if(i>=10 && i<100) tam=11;
+        if(i>=100) tam=12;
+        i++;
+    }
+}
+un pathname, se debe utilizar la entrada estandarpara recogerlo
+        char name2[20];
+	printf("intruduce el pathname: ");
+        scanf("%s",name2);
+        name=name2;
+    }
+
+    if((fd1=open("archivo2",O_CREAT|O_TRUNC|O_WRONLY,S_IRUSR|S_IWUSR))<0) {
+        printf("\nError %d en open",errno);
+        perror("\nError en open");
+        exit(-1);
+    }
+    if((fd2=open(name,O_RDONLY,S_IRUSR|S_IWUSR))<0) {
+        printf(#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <time.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
+#define tamano 1024
+#define longnombre 50
+
+void bloqueo(int dbloqueo,int orden) {
+    struct flock cerrojo;
+    cerrojo.l_type=orden;
+    cerrojo.l_whence=SEEK_SET;
+    cerrojo.l_start=0;
+    cerrojo.l_len=0;
+    if (fcntl(dbloqueo,F_SETLKW,&cerrojo)==-1) {
+        perror("PROXY:problema");
+        exit(1);
+    }
+}
+
+
+
+main() {
+    char temp[longnombre],fifopidproxy[longnombre];;
+    char buffer[tamano];
+    int nbytes;
+    int dtemp;
+    int pidproxy;
+    //int fd[2];
+    int dbloqueo;
+    //pipe(fd);
+    pidproxy = getpid();
+    sprintf(temp,"temp-%d",pidproxy);
+    printf("PROXY %d: creamos un archivo temporal %s para lectura y escritura\n",pidproxy,temp);
+    sprintf(fifopidproxy,"fifo.%d",pidproxy);
+    if ((dtemp=open(temp,O_RDWR|O_CREAT))<0) {//lo abre para escritura y lectura
+        perror("PROXY :ERRORR en abir temp");
+        exit(-1);
+    }
+    printf("PROXY %d: leemos de la STDIN_FILENO y escribimos en el temporal\n",pidproxy);
+    //nbytes=read(fd[0],buffer,sizeof(buffer));// lee entrada y escribe en temporal
+    nbytes=read(STDIN_FILENO,buffer,sizeof(buffer));// lee entrada y escribe en temporal
+    while (nbytes>0) {
+        write(dtemp,buffer,nbytes);
+        //nbytes=read(fd[0],buffer,sizeof(buffer));
+        nbytes=read(STDIN_FILENO,buffer,sizeof(buffer));
+    }
+    printf("PROXY %d: abrimos el archivo bloqueo\n",pidproxy);
+    if ((dbloqueo=open("bloqueo",O_RDWR))<0) {
+        perror("PROXY:ERRORR en abir bloqueo");
+        exit(-1);
+    }
+    printf("PROXY %d: bloqueamos\n",pidproxy);
+    bloqueo(dbloqueo,F_WRLCK);
+    printf("PROXY %d: ya tenemos la pantalla en EM\n",pidproxy);
+    printf("PROXY %d: colocamos el puntero del archivo temporal en el origen\n",pidproxy);
+    if(lseek(dtemp,0,SEEK_SET)<0){
+	perror("PROXY :ERRORR en lseek");
+        exit(-1);
+    }
+    printf("PROXY %d:Leemos del temporal y escribimos en la pantalla\n",pidproxy);
+    nbytes=read(dtemp,buffer,sizeof(buffer));//lee de temporal y esribe en pantalla
+    while (nbytes>0) {
+        printf("%s",buffer);
+        nbytes=read(dtemp,buffer,sizeof(buffer));
+    }
+    bloqueo(dbloqueo,F_UNLCK);
+    printf("\nPROXY %d:desbloqueamos\n",pidproxy);
+    printf("PROXY %d: eliminamos el archivo temporal %s\n",pidproxy,temp);
+    if ((unlink(temp))==-1) {//elimina el archivo
+        perror("PROXY:ERRORR en eliminar temp");
+        exit(-1);
+    }
+     printf("PROXY %d: eliminamos el archivo fifopidproxy %s\n",pidproxy,fifopidproxy);
+    if ((unlink(fifopidproxy))==-1) {//elimina el archivo
+        perror("PROXY:ERRORR en eliminar fifopidproxy");
+        exit(-1);
+    }
+    exit(0);
+}
+a tenemos la pantalla en EM\n",pidproxy);
+    printf("PROXY %d: colocamos el puntero del archivo temporal en el origen\n",pidproxy);
+    if(lseek(dtemp,0,SEEK_SET)<0){
+	perror("PROXY :ERRORR en lseek");
+        exit(-1);
+    }
+    printf("PROXY %d:Leemos del temporal y escribimos en #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <time.h>
+#include <signal.h>
+#include <errno.h>
+
+#define tamano 1024
+#define longnombre 50
+
+// Manejador de senal (SIGPIPE) para cuando se escribe en FIFO no abierto aun
+// para lectura, por defecto esta senal terminaria el proceso.
+static void mimanejador(int senal) {
+    printf("Cliente %d: escribo en el FIFO aun no abierto para lectura\n", getpid());
+    return;
+}
+
+
+// Funcion que devuelve un descriptor al FIFO a utilizar para imprimir.
+int obtenerfifo(int dfifoe, int dfifos, int mipid) {
+    int mififo, resultado, pidproxy;
+    char nombrefifoproxy[longnombre];
+    // Escribe cualquier cosa en el FIFO conocido del servidor
+    if (!(resultado =write(dfifoe,&mipid,sizeof(int)))) {
+        perror("Cliente: error al escribir peticion en fifo conocido del servidor");
+        exit(1);
+    }
+    printf("Cliente %d: escrito pid en fifo conocido del servidor.\n",mipid);
+    // Obtiene el pid del proceso proxy con el que se va a comunicar
+    if (!(resultado = read(dfifos,&pidproxy,sizeof(int)))) {
+        perror("Cliente: error al leer fifo proxy asignado por servidor");
+        exit(1);
+    }
+    printf("Cliente %d: leido pid %d en fifo de servidor. \n",mipid,pidproxy);
+    // Abre el FIFO a utilizar en la comunicacion
+    sprintf(nombrefifoproxy,"fifo.%d",pidproxy);
+    if ((mififo = open(nombrefifoproxy, O_WRONLY)) == -1) {//lo abre par aescritura
+        perror("Cliente: problema al abrir fifo proxy asignado");
+        exit(1);
+    }
+    return (mififo);
+}
+
+
+void producir(char c, int mififo, int mipid) {
+    char bufer[tamano];
+    int contador=0, i=0, resultado;
+    int numcar;
+    // Genera un numero aleatorio entre 1 y 10000, va a ser el numero de caracteres a enviar.
+    srand((unsigned int) mipid);
+    numcar = 1 + (int)(10000.0*rand()/(RAND_MAX+1.0));
+    printf("Cliente %d: Numero caracteres %c a generar es %d\n",mipid,c,numcar);
+    // Pone el manejador para la senal SIGPIPE.
+    if (signal(SIGPIPE, mimanejador)== SIG_ERR)
+        perror("Cliente: Error configurando senal");
+    // Escritura de los datos.
+    while (contador<numcar) {
+        bufer[i] = c;
+        contador++;
+        i++;
+        if ((i == tamano) || (contador == numcar)) {
+            sleep((mipid+contador)%1);
+            if ((resultado = write(mififo, bufer, i)) == -1)
+                perror("ERROR AL ESCRIBIR EN EL FIFO");
+            printf("Cliente %d: He escrito en el fifo %d\n",mipid,resultado);
+            i= 0;
+        }
+    }
+}
+
+main(int argc, char **argv) {
+    char c = 'a';
+    int numcli, pid, mipid, i, dfifoe, dfifos, mififo, estado;
+    char nombrefifoe[longnombre], nombrefifos[longnombre];
+    setbuf(stdout, NULL);
+    if (argc < 3) {
+        printf("Clientes: Formato: clientes <nombre_fifo> <numero_clientes>\n");
+        exit(1);
+    }
+    else if (((numcli= atoi(argv[2])) > 10) || (numcli < 1)) {
+        printf("Clientes: <numero_clientes> comprendido entre 1 y 10\n");
+        exit(1);
+    }
+    // Compone los nombres de los FIFOs conocidos a partir del parametro,
+    // uno de entrada y otro de salida (desde el punto de vista del servidor).
+    sprintf(nombrefifoe,"%se",argv[1]);
+    sprintf(nombrefifos,"%ss",argv[1]);
+    if ((dfifoe = open(nombrefifoe, O_WRONLY)) == -1) {//escritura
+        perror("Clientes: Problema con el archivo fifo de entrada al servidor");
+        exit(1);
+    }
+    if ((dfifos = open(nombrefifos, O_RDWR)) == -1) {//lectura
+        perror("Clientes: Problema con el archivo fifo de salida del servidor");
+        exit(1);
+    }
+    // Crea procesos clientes, con un caracter distinto a imprimir cada uno.
+    for (i=1; i<numcli; i++) {//trabaja con todos los clientes menos el ultimo.
+        if ((pid = fork()) == -1) {
+            perror("Clientes: Problema al crear proceso cliente");
+            exit(1);
+        }
+        if (pid == 0) {// es hijo
+            mipid = getpid();
+            mififo = obtenerfifo(dfifoe, dfifos, mipid);
+            producir(c, mififo, mipid);
+            exit(0);
+        }
+        else//es padre
+            c++;// modifica el caracter
+    }
+    // El propio programa se convierte en un cliente.
+    mipid = getpid();
+    mififo = obtenerfifo(dfifoe, dfifos, mipid);
+    producir(c, mififo, mipid);
+    // El proceso original elimina zombies ya que es el padre.
+    while (wait(&estado)!=-1);
+    exit(0);
+}
+
+
+
+
+servidor");
+        exit(1);
+    }
+    if ((dfifos = open(nombrefifos, O_RDWR)) == -1) {//lectura
+        perror("Clientes: Problema con el archivo fifo de salida del servidor");
+        exit(1);
+    }
+    // Crea procesos clientes, con un caracter distinto a imprimir cada uno.
+    for (i=1; i<numcli; i++) {//trabaja con todos los clientes menos el ultimo.
+        if ((pid = fork()) == -1) {
+            perror("Clientes: Problema al crear proceso cliente");
+            exit(1);
+        }
+        if (pid == 0) {// es hijo
+            mipid = getpid();
+            mififo = obtenerfifo(dfifoe, dfifos, mipid);
+            producir(c, mififo, mipid);
+            exit(0);
+  

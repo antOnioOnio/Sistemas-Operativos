@@ -1,0 +1,45 @@
+El archivo /etc/passwd contiene una línea por cada usuario existente en el sistema; en cada línea hay una
+sucesion de campos separados por el delimitador ":"; se muestra a continuacion la orden cut con los
+argumentos adecuados para extraer de cada linea unicamente el campo numero 6, 
+que contiene el directorio inicial asociado al usuario, usando el delimitador : para la identificacion de campos:
+
+$ cat /etc/passwd
+lopezsantos:x:501:501:Amalia Lopez Santos:/tmp/lopez:/bin/bash
+..................
+$ cut -d: -f6 /etc/passwd
+/tmp/lopez
+/tmp/ruiza
+.......
+
+En prado.ugr.es se ha proporcionado un archivo con esta estructura (llamado etcpasswd) que es el que se procesará en esta prueba para asegurar que las rutas del campo 6 son todas de la misma longitud(10 bytes en concreto). Descarguelo en su directorio de trabajo.
+--------------------------------------------------------------------------------------------
+
+Se pide construir un programa en c llamado explorar.c (que tendra como unico argumentoo la ruta de un archivo regular) que lanzara un proceso hijo. 
+Padre e hijo se comunicaran a traves de un cauce(puede ser un archivo fifo o un cauce sin nombre, queda a su eleccion).
+
+El proceso hijo va a encargarse de ejecutar cut	-d:	-f6	etcpasswd y debera programarse lo
+adecuado para que esta sucecion de rutas puedan ser leidas por el padre. Debera redirigirse la salida de error
+estandar de la orden cut anterior al archivo proporcionado como primer argumento (sin que ello afecte a la salida de error estandar del proceso padre).
+
+El proceso padre, para cada ruta leida ...
+
+-deberá comprobar si existe, y si es de tipo directorio, proporcionando los mensajes correspondientes
+en la salida estandar; si una ruta no esxiste o no es de tipo directorio, no realiza
+las acciones siguientes.
+
+-para cada ruta que exista y que sea de tipo directorio, debera conseguir que dicho directorio tenga permisos rwx para el propietario (sin modificar los permisos que tuviera previamente para grupo u otros)
+
+-para cada ruta que exista y que sea de tipo directorio queremos comprobar si dentro de ese directorio existe el archivo de configuracion de nombre ".bashrc".
+En caso afirmativo muestra en la salida estandar un mensaje indicativo de que en ese directorio si existe ese archivo de configuracion y su contenido.
+Para mostrar el contenido de dicho archivo puede utilizar el metodo que vea preferible dentro de las distintas posibilidades utiles para ese proposito contenidas en los guiones de practicas.
+
+Ambos procesos deben ejecutarse en paralelo; no debera esperar el padre al fin del hijo para proceder con su procesamiento. Si el hijo termina inesperadamente (por ejemplo  porque se provoque su finalizacion por otro proceso) el padre debe conocer esa particularidad y mostrar un mensaje indicando esa circunstancia y el estado de finalizacion del hijo. No deben quedar hijos zombis.
+
+
+
+Nota sobre tamaños de cadenas : #include <limits.h>
+se define NMAE_MAX a 14 (maximo numero de bytes en un nombre de archivo, exceptuando el caracter terminacion nulo).
+se deifine PATH_MAX a 1024 (maximo numero de bytes en una ruta, incluyendo el caracter terminacion nulo.)
+
+
+

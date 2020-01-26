@@ -1,0 +1,7 @@
+antonio@antonio-ordenador:~/Escritorio/ejercicio4$ ./a.out &
+[1] 3208
+antonio@antonio-ordenador:~/Escritorio/ejercicio4$ procesando el archivo
+./a.out &
+[2] 3211
+antonio@antonio-ordenador:~/Escritorio/ejercicio4$ fcntl fallo: Resource temporarily unavailable
+
